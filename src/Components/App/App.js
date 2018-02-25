@@ -28,17 +28,27 @@ class App extends React.Component {
       return track.id === element.id;
     });
 
-    if(!idExists) this.state.playlistTracks.push(track);
+    if(!idExists){
+      let newPlaylistState = this.state.playlistTracks;
+      newPlaylistState.push(track);
+
+      this.setState(
+        {playlistTracks: newPlaylistState}
+      );
+     }
   }
 
   removeTrack(track){
-    let itemToRemove = this.state.playlistTracks.find(function(element) {
+    let newPlaylistState = this.state.playlistTracks;
+    let itemToRemove = newPlaylistState.find(function(element) {
       return track.id === element.id;
     });
 
-    let index = this.state.playlistTracks.indexOf(itemToRemove);
+    let index = newPlaylistState.indexOf(itemToRemove);
+
     if (index > -1){
-      this.state.playlistTracks.splice(index, 1);
+      newPlaylistState.splice(index, 1);
+      this.setState({playlistTracks: newPlaylistState});
     }
   }
 
@@ -55,7 +65,18 @@ class App extends React.Component {
   }
 
   search(term){
-    this.setState({searchResults: Spotify.search(term)});
+      Spotify.search(term).then(
+        function(response){
+          // Sometimes, some old promises were accomplished even after the last ones. Causing the input being empty
+          // but search results showing tracks based on those old promises.
+          // This was the only thing worked for me, probbably there as better, more elegant way to di this? To maybe cancel old promises based on some condition?
+          if(document.getElementById('searchBar').value.length > 0){
+            this.setState({searchResults: response});
+          }else{
+            this.setState({searchResults: []});
+          }
+        }.bind(this)
+      );
   }
 
   render() {

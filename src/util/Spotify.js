@@ -1,7 +1,7 @@
 let accessToken;
 let expiresIn;
 const CLIENT_ID = 'f4adebf0984449ffa1f7d0c4766c5dc1';
-const REDIRECT_URI = 'http://localhost:3000';
+const REDIRECT_URI = 'http://jammmingfmir86.surge.sh';
 
 
 const Spotify = {
@@ -27,7 +27,7 @@ const Spotify = {
     return fetch('https://api.spotify.com/v1/search?type=track&q=' + term, {headers: {'Authorization': 'Bearer ' + this.getAccessToken()}})
     .then(
       function(response){
-        if(response.ok) return response.json();
+        return (response.ok) ? response.json() : [];
       }
     ).then(
       function(jsonResponse){
@@ -60,12 +60,14 @@ const Spotify = {
 
     fetch('https://api.spotify.com/v1/me', {headers: headers}).then(
       function(response){
-        if(response.ok) return response.json();
+        if(response.ok){
+          return response.json();
+        }
       }
     ).then(
       function(jsonResponse){
-        userID = jsonResponse.id;
 
+        userID = jsonResponse.id;
         return fetch("https://api.spotify.com/v1/users/" + userID + "/playlists", {
           headers: headers,
           method: "POST",
@@ -77,11 +79,17 @@ const Spotify = {
         ).then(
           function(jsonResponse){
             playlistID = jsonResponse.id;
-            return fetch('https://api.spotify.com/v1/users/v1/users/' + userID + '/playlists/' + playlistID + '/tracks', {
+            return fetch('https://api.spotify.com/v1/users/' + userID + '/playlists/' + playlistID + '/tracks', {
               headers: headers,
               method: 'POST',
               body: JSON.stringify({uris: trackURIs})
-            })
+            }).then(
+              function(response){
+                if(response.ok){
+                  console.log("Playlist Status: " + response.statusText);
+                }
+              }
+            )
           }
         )
       }
