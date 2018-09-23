@@ -1,7 +1,7 @@
 let accessToken;
 let expiresIn;
 const CLIENT_ID = 'f4adebf0984449ffa1f7d0c4766c5dc1';
-const REDIRECT_URI = 'http://jammmingfmir86.surge.sh';
+const REDIRECT_URI = 'http://localhost:3000/';
 
 
 const Spotify = {
