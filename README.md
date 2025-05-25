@@ -2432,3 +2432,18 @@ In the future, we might start automatically compiling incompatible third-party m
 ## Something Missing?
 
 If you have ideas for more “How To” recipes that should be on this page, [let us know](https://github.com/facebookincubator/create-react-app/issues) or [contribute some!](https://github.com/facebookincubator/create-react-app/edit/master/packages/react-scripts/template/README.md)
+
+## Deploying to Netlify
+
+This application can be deployed to Netlify.
+
+1.  **Build Command:** Netlify should automatically detect the `npm run build` command from the `package.json`.
+2.  **Environment Variables:** You need to configure the following environment variables in your Netlify site's build settings:
+    *   `REACT_APP_SPOTIFY_CLIENT_ID`: Your Spotify application's Client ID.
+    *   `REACT_APP_SPOTIFY_REDIRECT_URI`: Your Netlify site's URL (e.g., `https://your-site-name.netlify.app/`).
+3.  **Spotify Developer Dashboard:**
+    *   Go to your Spotify Developer Dashboard.
+    *   Select your application and go to "Edit Settings".
+    *   Add your Netlify site's URL (e.g., `https://your-site-name.netlify.app/`) to the "Redirect URIs" section. This **must exactly match** the value you set for `REACT_APP_SPOTIFY_REDIRECT_URI`.
+
+A `.env` file can be used for local development (e.g., create a `.env` file in the root with your local `REACT_APP_SPOTIFY_CLIENT_ID` and `REACT_APP_SPOTIFY_REDIRECT_URI=http://localhost:3000/`). This file is included in `.gitignore` and should not be committed.
