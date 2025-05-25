@@ -1,7 +1,7 @@
 let accessToken;
 let expiresIn;
-const CLIENT_ID = 'f4adebf0984449ffa1f7d0c4766c5dc1';
-const REDIRECT_URI = 'http://localhost:3000/';
+const CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
+const REDIRECT_URI = process.env.REACT_APP_SPOTIFY_REDIRECT_URI;
 
 
 const Spotify = {
@@ -27,7 +27,12 @@ const Spotify = {
     return fetch('https://api.spotify.com/v1/search?type=track&q=' + term, {headers: {'Authorization': 'Bearer ' + this.getAccessToken()}})
     .then(
       function(response){
-        return (response.ok) ? response.json() : [];
+        if (response.ok) {
+          return response.json();
+        } else {
+          console.error(`Error searching tracks: ${response.status} ${response.statusText}`);
+          return []; // Maintain current behavior of returning empty on error
+        }
       }
     ).then(
       function(jsonResponse){
@@ -52,21 +57,26 @@ const Spotify = {
   },
 
   savePlaylist(playlistName, trackURIs){
-    if(!(playlistName && trackURIs)) return;
+    if(!(playlistName && trackURIs && trackURIs.length > 0)) { // Added check for non-empty trackURIs
+        console.log("Playlist name or tracks are missing. Not saving."); // Or handle as an error
+        return Promise.resolve(); // Return a resolved promise if not saving
+    }
 
     let headers = {'Authorization': 'Bearer ' + this.getAccessToken()};
     let userID;
-    let playlistID;
+    // let playlistID; // playlistID is defined in the scope it's used
 
-    fetch('https://api.spotify.com/v1/me', {headers: headers}).then(
+    return fetch('https://api.spotify.com/v1/me', {headers: headers}).then(
       function(response){
         if(response.ok){
           return response.json();
+        } else {
+          console.error(`Error fetching user ID: ${response.status} ${response.statusText}`);
+          throw new Error('Failed to fetch user ID');
         }
       }
     ).then(
       function(jsonResponse){
-
         userID = jsonResponse.id;
         return fetch("https://api.spotify.com/v1/users/" + userID + "/playlists", {
           headers: headers,
@@ -74,11 +84,16 @@ const Spotify = {
           body: JSON.stringify({name: playlistName})
         }).then(
           function(response){
-            if(response.ok) return response.json();
+            if(response.ok) {
+              return response.json();
+            } else {
+              console.error(`Error creating playlist: ${response.status} ${response.statusText}`);
+              throw new Error('Failed to create playlist');
+            }
           }
         ).then(
           function(jsonResponse){
-            playlistID = jsonResponse.id;
+            const playlistID = jsonResponse.id; // Defined playlistID here
             return fetch('https://api.spotify.com/v1/users/' + userID + '/playlists/' + playlistID + '/tracks', {
               headers: headers,
               method: 'POST',
@@ -86,12 +101,22 @@ const Spotify = {
             }).then(
               function(response){
                 if(response.ok){
-                  console.log("Playlist Status: " + response.statusText);
+                  console.log("Playlist saved successfully!");
+                  return response.json(); // Good practice to return the response
+                } else {
+                  console.error(`Error adding tracks to playlist: ${response.status} ${response.statusText}`);
+                  throw new Error('Failed to add tracks to playlist');
                 }
               }
             )
           }
         )
+      }
+    ).catch(
+      function(error) {
+        console.error("Failed to save playlist:", error.message);
+        // Optionally, re-throw the error or handle it further if needed by the caller
+        // For example, if the UI needs to react to this error: throw error;
       }
     )
   }

@@ -1,0 +1,25 @@
+# Environment variables
+.env
+
+# Dependencies
+/node_modules
+
+# Build directory
+/build
+
+# Coverage directory
+/coverage
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# سفر
+.DS_Store
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
