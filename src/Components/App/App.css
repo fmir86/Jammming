@@ -26,6 +26,14 @@ h2 {
   font-size: 1.55rem;
 }
 
+.App-notice {
+  padding: .5rem 1rem;
+  background-color: #b3261e;
+  text-align: center;
+  font-family: 'Work Sans', sans-serif;
+  color: #fff;
+}
+
 .App {
   height: 100%;
   padding: 0 17% 10% 17%;

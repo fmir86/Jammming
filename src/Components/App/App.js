@@ -23,6 +23,11 @@ class App extends React.Component {
     this.search = this.search.bind(this);
   }
 
+  componentDidMount(){
+    // Finish the Spotify login if we just came back from the authorize page.
+    Spotify.handleRedirect();
+  }
+
   addTrack(track){
     let idExists = this.state.playlistTracks.some(function(element) {
       return track.id === element.id;
@@ -83,6 +88,11 @@ class App extends React.Component {
     return (
       <div>
         <h1>Ja<span className="highlight">mmm</span>ing</h1>
+        {!Spotify.isConfigured() && (
+          <p className="App-notice">
+            Spotify is not configured. Set REACT_APP_SPOTIFY_CLIENT_ID in a .env file and restart the dev server (see README.md).
+          </p>
+        )}
         <div className="App">
           <SearchBar onSearch={this.search}/>
           <div className="App-playlist">
